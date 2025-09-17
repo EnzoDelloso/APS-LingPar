@@ -19,14 +19,14 @@ se sol_quente == é {
 }
 
 # Palavras-chave da RoçaLang
-let ->	fala
-if  ->	se
-else ->	senao
-while -> inté
-print -> grita
-true / false ->	é / numé
-and / or ->	e / ou
-not ->	num
+let ->	fala;
+if  ->	se;
+else ->	senao;
+while -> inté;
+print -> grita;
+true / false ->	é / numé;
+and / or ->	e / ou;
+not ->	num;
 
 # EBNF da RoçaLang
 programa        = { comando } ;
