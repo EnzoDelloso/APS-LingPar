@@ -28,7 +28,8 @@ print	grita
 true / false	é / numé
 and / or	e / ou
 not	num
-EBNF da RoçaLang
+
+# EBNF da RoçaLang
 programa        = { comando } ;
 
 comando         = declaracao
