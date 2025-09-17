@@ -1,11 +1,11 @@
-# APS-LingPar
+## APS-LingPar
 
 
-RoçaLang: Linguagem de Programação da Roça
+# RoçaLang: Linguagem de Programação da Roça
 
 RoçaLang é uma linguagem de programação de alto nível inspirada no jeito simples e direto de falar do interior de Minas Gerais. Ela foi criada para controlar uma VM de automação rural chamada FazendinhaVM, responsável por tarefas como irrigar plantações, colher produtos, armazenar, e reagir ao clima.
 
-Exemplos de Código
+# Exemplos de Código
 fala milho = 10;
 
 inté milho > 0 {
@@ -18,7 +18,7 @@ se sol_quente == é {
     liga_sombra();
 }
 
-🧠 Palavras-chave da RoçaLang
+# Palavras-chave da RoçaLang
 Função	Palavra-chave mineira
 let (declara)	fala
 if	se
@@ -65,7 +65,7 @@ operador        = "+" | "-" | "*" | "/" ;
 letra           = "a" | "b" | ... | "z" | "A" | ... | "Z" ;
 digito          = "0" | "1" | ... | "9" ;
 
-🖥VM: FazendinhaVM (em construção)
+# VM: FazendinhaVM (em construção)
 
 A FazendinhaVM será capaz de interpretar o assembly gerado a partir de programas escritos em RoçaLang.
 
