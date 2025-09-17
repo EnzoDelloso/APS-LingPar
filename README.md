@@ -1,12 +1,13 @@
-## APS-LingPar
+# APS-LingPar
 
+##  RoçaLang: Linguagem da Roça
 
-# RoçaLang: Linguagem de Programação da Roça
+RoçaLang possui uma sintaxe inspirada na fala do interior de Minas Gerais, buscando um código acessível e fácil de entender para quem não é programador profissional.
 
-RoçaLang é uma linguagem de programação de alto nível inspirada no jeito simples e direto de falar do interior de Minas Gerais. Ela foi criada para controlar uma VM de automação rural chamada FazendinhaVM, responsável por tarefas como irrigar plantações, colher produtos, armazenar, e reagir ao clima.
+### Exemplos de Código RoçaLang
 
-# Exemplos de Código
-fala milho = 10;
+```rocalang
+trem milho = 10;
 
 inté milho > 0 {
     colhe("milho");
@@ -17,18 +18,24 @@ inté milho > 0 {
 se sol_quente == é {
     liga_sombra();
 }
+```
+## Palavras-chave da RoçaLang
+| RoçaLang | Significado Tradicional | Descrição               |
+| -------- | ----------------------- | ----------------------- |
+| `trem`   | let                     | Declaração de variável  |
+| `se`     | if                      | Condicional             |
+| `senao`  | else                    | Condicional alternativa |
+| `inté`   | while                   | Loop                    |
+| `grita`  | print                   | Impressão               |
+| `é`      | true                    | Booleano verdadeiro     |
+| `numé`   | false                   | Booleano falso          |
+| `e`      | and                     | Operador lógico AND     |
+| `ou`     | or                      | Operador lógico OR      |
+| `num`    | not                     | Operador lógico NOT     |
 
-# Palavras-chave da RoçaLang
-let ->	fala;
-if  ->	se;
-else ->	senao;
-while -> inté;
-print -> grita;
-true / false ->	é / numé;
-and / or ->	e / ou;
-not ->	num;
 
-# EBNF da RoçaLang
+## EBNF Completa da RoçaLang
+```
 programa        = { comando } ;
 
 comando         = declaracao
@@ -38,7 +45,7 @@ comando         = declaracao
                 | acao
                 ;
 
-declaracao      = "fala" identificador [ "=" expressao ] ";" ;
+declaracao      = "trem" identificador [ "=" expressao ] ";" ;
 atribuicao      = identificador "=" expressao ";" ;
 
 condicional     = "se" condicao "{" { comando } [ "} senao {" { comando } ] "}" ;
@@ -64,37 +71,86 @@ operador        = "+" | "-" | "*" | "/" ;
 
 letra           = "a" | "b" | ... | "z" | "A" | ... | "Z" ;
 digito          = "0" | "1" | ... | "9" ;
+```
+## FazendinhaVM: Máquina Virtual da Roça
+A FazendinhaVM é uma máquina virtual simples e didática, projetada para executar o Assembly gerado a partir de programas escritos em RoçaLang.
 
-# VM: FazendinhaVM (em construção)
+Arquitetura da VM
+### Registradores
 
-A FazendinhaVM será capaz de interpretar o assembly gerado a partir de programas escritos em RoçaLang.
+| Registrador | Descrição                        |
+| ----------- | -------------------------------- |
+| `R1`        | Registrador de propósito geral 1 |
+| `R2`        | Registrador de propósito geral 2 |
 
-Recursos da VM:
+```
+MOV R1, 5        ; R1 ← 5
+ADD R1, R2       ; R1 ← R1 + R2
+```
 
-Registradores: R1, R2
+### Memória
+1024 posições (ram[1024])
 
-Sensores (read-only):
+Leitura e escrita permitidas, exceto áreas de sensores (somente leitura)
 
-sol_quente
+Armazena variáveis e dados temporários
 
-chuva
+### Sensores (endereços read-only)
+| Endereço | Sensor      | Descrição                    |
+| -------- | ----------- | ---------------------------- |
+| `1000`   | sol\_quente | 1 se o sol estiver forte     |
+| `1001`   | chuva       | 1 se estiver chovendo        |
+| `1002`   | umidade     | Valor entre 0 e 100          |
+| `1003`   | dia         | 1 se for dia, 0 se for noite |
 
-umidade
 
-dia
+Exemplo de leitura:
 
-Instruções da VM:
+```
+LOAD R1, 1000      ; R1 ← valor de sol_quente
+CMP R1, 1
+JZ LIGA_SOMBRA
+```
 
-JOGA_AGUA
+### Instruções da VM
+| Instrução        | Descrição                                   |
+| ---------------- | ------------------------------------------- |
+| `MOV Rn, val`    | Move valor literal para o registrador       |
+| `LOAD Rn, addr`  | Carrega valor da memória para o registrador |
+| `STORE Rn, addr` | Salva valor do registrador na memória       |
+| `ADD Rn, Rm`     | Soma dois registradores                     |
+| `SUB Rn, Rm`     | Subtrai Rm de Rn                            |
+| `CMP Rn, val`    | Compara Rn com valor (altera flag zero)     |
+| `JMP label`      | Salto incondicional para label              |
+| `JZ label`       | Salta se flag zero                          |
+| `JNZ label`      | Salta se flag diferente de zero             |
+| `CALL addr`      | Chama sub-rotina (ação da fazenda)          |
+| `RET`            | Retorna de sub-rotina                       |
+| `HALT`           | Finaliza programa                           |
 
-COLHE
 
-PLANTA
+### Ações da Fazenda (Sub-rotinas)
+| Label / Endereço | Ação         | Descrição                 |
+| ---------------- | ------------ | ------------------------- |
+| `200`            | JOGA\_AGUA   | Aciona irrigação          |
+| `201`            | COLHE        | Colhe planta atual        |
+| `202`            | PLANTA       | Planta nova semente       |
+| `203`            | ESPERA       | Aguarda um tempo simulado |
+| `204`            | LIGA\_SOMBRA | Liga proteção contra sol  |
+| `205`            | ACENDE\_LUZ  | Liga luz para plantações  |
+| `206`            | ARMAZENA     | Armazena item colhido     |
 
-ESPERA
 
-LIGA_SOMBRA
+### Exemplo de Código Assembly - se sol está quente, liga sombra:
 
-ACENDE_LUZ
+```
+LOAD R1, 1000        ; R1 ← sensor sol_quente
+CMP R1, 1            ; Compara com 1 (quente)
+JZ LIGA              ; Se for, pula para ligar
 
-ARMAZENA
+JMP FIM              ; Senão, fim
+
+LIGA:
+CALL 204             ; Chama rotina LIGA_SOMBRA
+JMP FIM
+```
