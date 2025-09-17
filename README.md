@@ -10,8 +10,8 @@ RoçaLang possui uma sintaxe inspirada na fala do interior de Minas Gerais, busc
 trem milho = 10;
 
 inté milho > 0 {
-    colhe("milho");
-    bota_no_cesto("milho");
+    colhe(milho);
+    armazena(milho)
     milho = milho - 1;
 }
 
