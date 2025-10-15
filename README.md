@@ -7,31 +7,32 @@ RoçaLang possui uma sintaxe inspirada na fala do interior de Minas Gerais, busc
 ### Exemplos de Código RoçaLang
 
 ```rocalang
-trem milho = 10;
+trem milho tem 10
 
-inté milho > 0 {
-    colhe(milho);
-    armazena(milho)
-    milho = milho - 1;
-}
-
-se sol_quente == é {
-    liga_sombra();
-}
+inté milho > 0 faz
+grita "Colhendo um milho"
+colhe milho
+armazena milho
+milho tem milho - 1
+finté
 ```
-## Palavras-chave da RoçaLang
-| RoçaLang | Significado Tradicional | Descrição               |
-| -------- | ----------------------- | ----------------------- |
-| `trem`   | let                     | Declaração de variável  |
-| `se`     | if                      | Condicional             |
-| `senao`  | else                    | Condicional alternativa |
-| `inté`   | while                   | Loop                    |
-| `grita`  | print                   | Impressão               |
-| `é`      | true                    | Booleano verdadeiro     |
-| `numé`   | false                   | Booleano falso          |
-| `e`      | and                     | Operador lógico AND     |
-| `ou`     | or                      | Operador lógico OR      |
-| `num`    | not                     | Operador lógico NOT     |
+###  Palavras da Roça
+| Palavra RoçaLang | Significado             |
+| ---------------- | ----------------------: |
+| `trem`           | Declara uma variável    |
+| `tem`            | Atribui um valor        |
+| `se`             | Condicional             |
+| `senao`          | Alternativa             |
+| `inté`           | Repetição               |
+| `grita`          | Mostra algo na tela     |
+| `é`              | Valor verdadeiro        |
+| `numé`           | Valor falso             |
+| `e`              | Operador lógico E       |
+| `ou`             | Operador lógico OU      |
+| `num`            | Negação lógica          |
+| `igual`          | Comparação de igualdade |
+| `diferente`      | Comparação de diferença |
+
 
 
 ## EBNF Completa da RoçaLang
@@ -45,112 +46,160 @@ comando         = declaracao
                 | acao
                 ;
 
-declaracao      = "trem" identificador [ "=" expressao ] ";" ;
-atribuicao      = identificador "=" expressao ";" ;
+declaracao      = "trem" identificador [ "tem" expressao ] ;
 
-condicional     = "se" condicao "{" { comando } [ "} senao {" { comando } ] "}" ;
+atribuicao      = identificador "tem" expressao ;
 
-repeticao       = "inté" condicao "{" { comando } "}" ;
+condicional     = "se" condicao "então"
+                    { comando }
+                  [ "senao"
+                    { comando } ]
+                  "fimse" ;
 
-acao            = identificador "(" [ argumentos ] ")" ";" ;
+repeticao       = "inté" condicao "faz"
+                    { comando }
+                  "finté" ;
 
-condicao        = expressao comparador expressao ;
+acao            = identificador [ argumentos ]
+                | identificador { " " expressao } ;
 
-expressao       = numero
-                | identificador
-                | expressao operador expressao
+condicao        = expressao comparador expressao
+                | "(" condicao ")"
+                | "num" condicao
+                | condicao "e" condicao
+                | condicao "ou" condicao
                 ;
 
-argumentos      = expressao { "," expressao } ;
+expressao       = termo { operador termo } ;
 
-identificador   = letra { letra | digito | "_" } ;
-numero          = [ "-" ] digito { digito } ;
+termo           = numero
+                | identificador
+                | booleano
+                | "(" expressao ")"
+                ;
 
-comparador      = ">" | "<" | ">=" | "<=" | "==" | "!=" ;
+argumentos      = "(" [ expressao { "," expressao } ] ")" ;
+
+booleano        = "é" | "numé" ;
+
+comparador      = ">" | "<" | ">=" | "<=" | "igual" | "diferente" ;
+
 operador        = "+" | "-" | "*" | "/" ;
 
-letra           = "a" | "b" | ... | "z" | "A" | ... | "Z" ;
+identificador   = letra { letra | digito | "_" } ;
+
+numero          = [ "-" ] digito { digito } ;
+
+letra           = "a" | "b" | ... | "z"
+                | "A" | ... | "Z" ;
+
 digito          = "0" | "1" | ... | "9" ;
 ```
 ## FazendinhaVM: Máquina Virtual da Roça
 A FazendinhaVM é uma máquina virtual simples e didática, projetada para executar o Assembly gerado a partir de programas escritos em RoçaLang.
 
 Arquitetura da VM
-### Registradores
+### Visão Geral
 
-| Registrador | Descrição                        |
-| ----------- | -------------------------------- |
-| `R1`        | Registrador de propósito geral 1 |
-| `R2`        | Registrador de propósito geral 2 |
+| Recurso                 | Descrição                                                          |
+| ----------------------- | ------------------------------------------------------------------ |
+| **Trilhos (T1–T4)**     | Caminhos por onde os dados (“trem”) correm.                        |
+| **Depósito**            | Memória principal (1024 posições), onde os “trem” ficam guardados. |
+| **Sensores da Fazenda** | Endereços fixos de leitura (sol, chuva, umidade, dia).             |
+| **Buzina (PC)**         | Indica a próxima instrução a ser executada.                        |
+| **Galpão de Ações**     | Conjunto de comandos fixos da fazenda.                             |
+| **Modo de Operação**    | Pode ser *Plantio*, *Colheita* ou *Repouso*.                       |
 
-```
-MOV R1, 5        ; R1 ← 5
-ADD R1, R2       ; R1 ← R1 + R2
-```
+### Tipos de Trem
 
-### Memória
-1024 posições (ram[1024])
+| Tipo      | Código | Exemplo             |
+| --------- | ------ | ------------------- |
+| `INTEIRO` | 0      | 42                  |
+| `VERDADE` | 1      | é / numé            |
+| `SENSOR`  | 2      | sol_quente, umidade |
+| `ITEM`    | 3      | milho, semente      |
 
-Leitura e escrita permitidas, exceto áreas de sensores (somente leitura)
-
-Armazena variáveis e dados temporários
 
 ### Sensores (endereços read-only)
-| Endereço | Sensor      | Descrição                    |
-| -------- | ----------- | ---------------------------- |
-| `1000`   | sol\_quente | 1 se o sol estiver forte     |
-| `1001`   | chuva       | 1 se estiver chovendo        |
-| `1002`   | umidade     | Valor entre 0 e 100          |
-| `1003`   | dia         | 1 se for dia, 0 se for noite |
+| Endereço | Nome         | Descrição                    |
+| -------- | ------------ | ---------------------------- |
+| 900      | `sol_quente` | 1 se o sol estiver forte     |
+| 901      | `chuva`      | 1 se estiver chovendo        |
+| 902      | `umidade`    | valor entre 0 e 100          |
+| 903      | `dia`        | 1 se for dia, 0 se for noite |
 
 
-Exemplo de leitura:
-
-```
-LOAD R1, 1000      ; R1 ← valor de sol_quente
-CMP R1, 1
-JZ LIGA_SOMBRA
-```
-
-### Instruções da VM
-| Instrução        | Descrição                                   |
-| ---------------- | ------------------------------------------- |
-| `MOV Rn, val`    | Move valor literal para o registrador       |
-| `LOAD Rn, addr`  | Carrega valor da memória para o registrador |
-| `STORE Rn, addr` | Salva valor do registrador na memória       |
-| `ADD Rn, Rm`     | Soma dois registradores                     |
-| `SUB Rn, Rm`     | Subtrai Rm de Rn                            |
-| `CMP Rn, val`    | Compara Rn com valor (altera flag zero)     |
-| `JMP label`      | Salto incondicional para label              |
-| `JZ label`       | Salta se flag zero                          |
-| `JNZ label`      | Salta se flag diferente de zero             |
-| `CALL addr`      | Chama sub-rotina (ação da fazenda)          |
-| `RET`            | Retorna de sub-rotina                       |
-| `HALT`           | Finaliza programa                           |
+### Instruções da Roça
+| Instrução            | Descrição                                                          |
+| -------------------- | ------------------------------------------------------------------ |
+| **POE Tn, valor**    | Coloca um valor direto em `Tn`. (≃ MOV)                            |
+| **PEGA Tn, lugar**   | Lê `Depósito[lugar]` e joga em `Tn`. (≃ LOAD)                      |
+| **GUARDA Tn, lugar** | Escreve o conteúdo de `Tn` no depósito. (≃ STORE)                  |
+| **AJUNTA Tn, Tm**    | Soma os valores de `Tn` e `Tm`. (≃ ADD)                            |
+| **TIRA Tn, Tm**      | Subtrai `Tm` de `Tn`. (≃ SUB)                                      |
+| **VÊ Tn, Tm**        | Compara os valores e ajusta as bandeiras de verdade (Z/N). (≃ CMP) |
+| **SIEH vai_pra**     | Salta se a bandeira de verdade for verdadeira. (≃ JZ)              |
+| **SINUMEH vai_pra**  | Salta se a bandeira de verdade for falsa. (≃ JNZ)                  |
+| **VORTA vai_pra**    | Salto incondicional. (≃ JMP)                                       |
+| **CHAMA nome**       | Chama uma ação do galpão. (≃ CALL)                                 |
+| **DEVORVI**          | Retorna da ação chamada. (≃ RET)                                   |
+| **PERAE**            | Pausa a execução por um tempo simulado. (≃ WAIT)                   |
+| **ACABA**            | Finaliza o programa. (≃ HALT)                                      |
 
 
-### Ações da Fazenda (Sub-rotinas)
-| Label / Endereço | Ação         | Descrição                 |
-| ---------------- | ------------ | ------------------------- |
-| `200`            | JOGA\_AGUA   | Aciona irrigação          |
-| `201`            | COLHE        | Colhe planta atual        |
-| `202`            | PLANTA       | Planta nova semente       |
-| `203`            | ESPERA       | Aguarda um tempo simulado |
-| `204`            | LIGA\_SOMBRA | Liga proteção contra sol  |
-| `205`            | ACENDE\_LUZ  | Liga luz para plantações  |
-| `206`            | ARMAZENA     | Armazena item colhido     |
+
+### Ações do Galpão
+| Ação          | Código | Descrição                            |
+| ------------- | ------ | ------------------------------------ |
+| `PLANTA`      | 10     | Planta um novo trem (semente).       |
+| `COLHE`       | 11     | Colhe o que tiver pronto.            |
+| `ARMAZENA`    | 12     | Guarda o item colhido no depósito.   |
+| `JOGA_AGUA`   | 13     | Irriga a plantação.                  |
+| `LIGA_SOMBRA` | 14     | Liga a sombra se o sol tiver quente. |
+| `ACENDE_LUZ`  | 15     | Acende a luz de cultivo.             |
+
 
 
 ### Exemplo de Código Assembly - se sol está quente, liga sombra:
 
 ```
-LOAD R1, 1000        ; R1 ← sensor sol_quente
-CMP R1, 1            ; Compara com 1 (quente)
-JZ LIGA              ; Se for, pula para ligar
+PEGA T1, sol_quente      ; vê se o sol tá quente
+VÊ T1, é                 ; compara com verdade
+SIEH LIGA_SOMBRA         ; se for, vai pra ligar a sombra
+VORTA FIM                ; sinumeh, pula pro fim
 
-JMP FIM              ; Senão, fim
+LIGA_SOMBRA:
+CHAMA LIGA_SOMBRA
+DEVORVI
 
-LIGA:
-CALL 204             ; Chama rotina LIGA_SOMBRA
-JMP FIM
+FIM:
+ACABA
+
+```
+
+### Modos de operação
+
+| Modo         | Descrição                             | Uso                |
+| ------------ | ------------------------------------- | ------------------ |
+| **Plantio**  | Carrega variáveis e inicializa dados. | início do programa |
+| **Colheita** | Executa lógica e ações.               | execução normal    |
+| **Repouso**  | Espera sensores ou eventos.           | pausa ou espera    |
+
+
+### Programa de exemplo maior
+
+```
+POE T1, 10           ; tem 10 milho
+PLANTA               ; planta o primeiro
+
+ENQUANTO:
+VÊ T1, 0
+SINUMEH FIM
+CHAMA COLHE
+CHAMA ARMAZENA
+TIRA T1, 1
+VORTA ENQUANTO
+
+FIM:
+ACABA
 ```
