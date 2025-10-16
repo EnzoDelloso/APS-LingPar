@@ -1,0 +1,13 @@
+trem chuva tem 1
+trem sol tem 0
+
+se chuva igual 1 entao
+  grita "Tá chovendo, num precisa molhar!"
+senao
+  grita "Sol quente, vamo jogar água!"
+fimse
+
+inte sol < 5 faz
+  grita "Jogando água na roça"
+  sol tem sol + 1
+finte
