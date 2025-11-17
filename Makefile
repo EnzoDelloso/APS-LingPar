@@ -1,12 +1,14 @@
 all: rocalang
 
-rocalang: rocalang.tab.c lex.yy.c
-	$(CC) -o rocalang rocalang.tab.c lex.yy.c -lfl
+rocalang: rocalang.tab.c lex.yy.c main.c
+	bison -d rocalang.y
+	flex rocalang.l
+	gcc -Wall -g rocalang.tab.c lex.yy.c main.c -o rocalang -lfl
 
 rocalang.tab.c rocalang.tab.h: rocalang.y
 	bison -d rocalang.y
 
-lex.yy.c: rocalang.l rocalang.tab.h
+lex.yy.c: rocalang.l
 	flex rocalang.l
 
 clean:

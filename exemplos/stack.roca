@@ -1,0 +1,19 @@
+trem tempo tem 10
+empurra tempo
+
+trem tempo tem 20
+empurra tempo
+
+trem tempo tem 30
+empurra tempo
+
+grita "Estado após empilhar"
+
+puxa energia
+grita "Desempilhou 30"
+
+puxa energia
+grita "Desempilhou 20"
+
+puxa energia
+grita "Desempilhou 10"

@@ -1,0 +1,5 @@
+trem x tem 3
+grita "Iniciando loop de incremento"
+inté x faz
+grita "Incrementando x"
+finte

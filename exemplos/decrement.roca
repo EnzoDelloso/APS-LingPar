@@ -1,0 +1,9 @@
+trem y tem 5
+
+grita "Iniciando loop de decremento"
+inte y  faz
+  grita "Decrementando y"
+  y tem y - 1
+finte
+
+grita "Loop de decremento finalizado"
